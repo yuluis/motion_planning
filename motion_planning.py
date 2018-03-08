@@ -4,7 +4,7 @@ import msgpack
 from enum import Enum, auto
 
 import numpy as np
-
+import re
 from planning_utils import a_star, heuristic, create_grid
 from udacidrone import Drone
 from udacidrone.connection import MavlinkConnection
@@ -120,7 +120,14 @@ class MotionPlanning(Drone):
         self.target_position[2] = TARGET_ALTITUDE
 
         # TODO: read lat0, lon0 from colliders into floating point values
-        
+        file = open("colliders.csv","r")
+        file.readline()
+        data = file.readline()
+        lat0, lon0 = data.split(",")
+        lat0 = float(lat0)
+        lon0 = float(lon0)
+
+        print("starting latitude, longitude",lat0,lon0)
         # TODO: set home position to (lat0, lon0, 0)
 
         # TODO: retrieve current global position
