@@ -6,7 +6,7 @@ from enum import Enum, auto
 import numpy as np
 import re
 import utm
-from planning_utils import a_star, heuristic, create_grid, global_to_local
+from planning_utils import a_star, heuristic, create_grid
 from udacidrone import Drone
 from udacidrone.connection import MavlinkConnection
 from udacidrone.messaging import MsgID
