@@ -5,7 +5,8 @@ from enum import Enum, auto
 
 import numpy as np
 import re
-from planning_utils import a_star, heuristic, create_grid
+import utm
+from planning_utils import a_star, heuristic, create_grid, global_to_local
 from udacidrone import Drone
 from udacidrone.connection import MavlinkConnection
 from udacidrone.messaging import MsgID
@@ -126,14 +127,17 @@ class MotionPlanning(Drone):
         lat0, lon0 = data.split(",")
         lat0 = float(lat0)
         lon0 = float(lon0)
+        file.close()
 
         print("starting latitude, longitude",lat0,lon0)
         # TODO: set home position to (lat0, lon0, 0)
 
-        # TODO: retrieve current global position
- 
+        self.set_home_position(lon0, lat0, 0)  # set the current location to be the home position
         # TODO: convert to current local position using global_to_local()
-        
+        global_home = [lon0, lat0, 0]
+        global_position = [lon0, lat0, 0]
+        local_position = global_to_local(global_position, global_home)
+
         print('global home {0}, position {1}, local position {2}'.format(self.global_home, self.global_position,
                                                                          self.local_position))
         # Read in obstacle map

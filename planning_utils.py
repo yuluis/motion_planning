@@ -146,3 +146,13 @@ def a_star(grid, h, start, goal):
 def heuristic(position, goal_position):
     return np.linalg.norm(np.array(position) - np.array(goal_position))
 
+# From Geodetic to NED_solution
+def global_to_local(global_position, global_home):
+    
+    (east_home, north_home, _, _) = utm.from_latlon(global_home[1], global_home[0])
+    
+    (east, north, _, _) = utm.from_latlon(global_position[1], global_position[0])
+                                          
+    local_position = np.array([north - north_home, east - east_home, -global_position[2]])
+    
+    return local_position
