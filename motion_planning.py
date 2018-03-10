@@ -6,7 +6,7 @@ from enum import Enum, auto
 import numpy as np
 import re
 import utm
-from planning_utils import a_star, heuristic, create_grid
+from planning_utils import a_star, heuristic, create_grid, prune_path
 from udacidrone import Drone
 from udacidrone.connection import MavlinkConnection
 from udacidrone.messaging import MsgID
@@ -156,8 +156,15 @@ class MotionPlanning(Drone):
         start = (int(local_position[0]+north_offset), int(local_position[1]+east_offset))
         
         # Set goal as some arbitrary position on the grid
-        local_target = global_to_local((-122.396384, 37.793278, 0), global_home)
+        #local_target = global_to_local((-122.396384, 37.793278, 0), global_home) # up market
+        #local_target = global_to_local((-122.398805, 37.793372, 0), global_home) # around the corner
+        #local_target = global_to_local((-122.398321, 37.791719, 0), global_home) # down market
+        local_target = global_to_local((-122.397762, 37.793118, 0), global_home)  # around the building
+
         grid_goal = (int(north_offset + local_target[0]), int(east_offset + local_target[1]))
+        while grid[grid_goal] == 1.0 :
+            grid_goal = (grid_goal[0] + 1, grid_goal[1]) # place goal to first available position north of requested
+
         # DO: adapt to set goal as latitude / longitude position and convert
 
         # Run A* to find a path from start to goal
@@ -166,14 +173,16 @@ class MotionPlanning(Drone):
         print('Local Start and Goal: ', grid_start, grid_goal)
         path, _ = a_star(grid, heuristic, grid_start, grid_goal)
         #path = [[305,435],grid_goal]
-        # TODO: prune path to minimize number of waypoints
-        # TODO (if you're feeling ambitious): Try a different approach altogether!
+        # DO: prune path to minimize number of waypoints
+        # DO (if you're feeling ambitious): Try a different approach altogether!
+        pruned_path = prune_path(path)
+        print(len(pruned_path))
 
         # Convert path to waypoints
-        waypoints = [(p[0] - north_offset, p[1] - east_offset, TARGET_ALTITUDE+1) for p in path]
+        waypoints = [(p[0] - north_offset, p[1] - east_offset, TARGET_ALTITUDE+1) for p in pruned_path]
         # Set self.waypoints
         self.waypoints = waypoints
-        # TODO: send waypoints to sim
+        # DO: send waypoints to sim
         self.send_waypoints()
 
     def start(self):
