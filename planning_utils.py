@@ -1,7 +1,7 @@
 from enum import Enum
 from queue import PriorityQueue
 import numpy as np
-
+from queue import PriorityQueue
 
 def create_grid(data, drone_altitude, safety_distance):
     """
@@ -193,3 +193,60 @@ def prune_path(path):
         else:
             i += 1
     return pruned_path
+
+
+def valid_actions_graph(graph, current_node):
+    # show what edges of current_node
+    neighbors = list(nx.all_neighbors(G, close_start_pt))
+    return neighbors
+
+###### THIS IS YOUR OLD GRID-BASED A* IMPLEMENTATION #######
+###### With a few minor modifications it can work with graphs! ####
+# TODO: modify A* to work with a graph
+def a_star_graph(graph, heuristic, start, goal):
+    path = []
+    queue = PriorityQueue()
+    queue.put((0, start))
+    visited = set(start)
+
+    branch = {}
+    found = False
+
+    while not queue.empty():
+        item = queue.get()
+        current_cost = item[0]
+        current_node = item[1]
+
+        if current_node == goal:
+            print('Found a path.')
+            found = True
+            break
+
+        else:
+            for action in valid_actions_graph(graph, current_node):
+                # get the tuple representation
+                da = action.delta
+                cost = action.cost
+                next_node = (current_node[0] + da[0], current_node[1] + da[1])
+                new_cost = current_cost + cost + h(next_node, goal)
+
+                if next_node not in visited:
+                    visited.add(next_node)
+                    queue.put((new_cost, next_node))
+
+                    branch[next_node] = (new_cost, current_node, action)
+
+    path = []
+    path_cost = 0
+    if found:
+
+        # retrace steps
+        path = []
+        n = goal
+        path_cost = branch[n][0]
+        while branch[n][1] != start:
+            path.append(branch[n][2])
+            n = branch[n][1]
+        path.append(branch[n][2])
+
+    return path[::-1], path_cost
