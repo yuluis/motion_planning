@@ -35,10 +35,10 @@ def create_grid(data, drone_altitude, safety_distance):
 
         if alt + d_alt + safety_distance > drone_altitude:
             obstacle = [
-                int(north - d_north - safety_distance - north_min_center),
-                int(north + d_north + safety_distance - north_min_center),
-                int(east - d_east - safety_distance - east_min_center),
-                int(east + d_east + safety_distance - east_min_center),
+                int(north - d_north - safety_distance - north_min),
+                int(north + d_north + safety_distance - north_min),
+                int(east - d_east - safety_distance - east_min),
+                int(east + d_east + safety_distance - east_min),
             ]
             grid[obstacle[0]:obstacle[1], obstacle[2]:obstacle[3]] = 1
 

@@ -6,6 +6,8 @@ from enum import Enum, auto
 import numpy as np
 import re
 import utm
+
+import time
 from planning_utils import a_star, heuristic, create_grid, prune_path
 from udacidrone import Drone
 from udacidrone.connection import MavlinkConnection
@@ -32,7 +34,7 @@ class MotionPlanning(Drone):
         self.waypoints = []
         self.in_mission = True
         self.check_state = {}
-
+        #self.timeout = 10
         # initial state
         self.flight_state = States.MANUAL
 
@@ -115,8 +117,10 @@ class MotionPlanning(Drone):
     def plan_path(self):
         self.flight_state = States.PLANNING
         print("Searching for a path ...")
+        print("Time is: ", time.clock())
+
         TARGET_ALTITUDE = 5
-        SAFETY_DISTANCE = 3
+        SAFETY_DISTANCE = 4
 
         self.target_position[2] = TARGET_ALTITUDE
 
@@ -147,6 +151,7 @@ class MotionPlanning(Drone):
         east_offset = int(np.abs(np.min(data[:, 1])))
 
         print("North offset = {0}, east offset = {1}".format(north_offset, east_offset))
+        print("Time is: ", time.clock())
 
         # Define a grid for a particular altitude and safety margin around obstacles
         grid = create_grid(data, TARGET_ALTITUDE, SAFETY_DISTANCE)
@@ -159,9 +164,13 @@ class MotionPlanning(Drone):
         #local_target = global_to_local((-122.396384, 37.793278, 0), global_home) # up market
         #local_target = global_to_local((-122.398805, 37.793372, 0), global_home) # around the corner
         #local_target = global_to_local((-122.398321, 37.791719, 0), global_home) # down market
-        local_target = global_to_local((-122.397762, 37.793118, 0), global_home)  # around the building
+        #local_target = global_to_local((-122.397762, 37.793118, 0), global_home)  # around the building
 
-        grid_goal = (int(north_offset + local_target[0]), int(east_offset + local_target[1]))
+        #grid_goal = (int(north_offset + local_target[0]), int(east_offset + local_target[1]))
+        grid_goal = (461,510)
+ #       grid_goal = (461,500)
+ #       grid_goal = (461,490)
+
         while grid[grid_goal] == 1.0 :
             grid_goal = (grid_goal[0] + 1, grid_goal[1]) # place goal to first available position north of requested
 
@@ -169,14 +178,16 @@ class MotionPlanning(Drone):
 
         # Run A* to find a path from start to goal
         # DO: add diagonal motions with a cost of sqrt(2) to your A* implementation
-        # or move to a different search space such as a graph (not done here)
+        # or move to a different search space such as a graph (not gfgdone here)
         print('Local Start and Goal: ', grid_start, grid_goal)
         path, _ = a_star(grid, heuristic, grid_start, grid_goal)
+        print("Time is after astar: ", time.clock())
         #path = [[305,435],grid_goal]
         # DO: prune path to minimize number of waypoints
         # DO (if you're feeling ambitious): Try a different approach altogether!
         pruned_path = prune_path(path)
         print(len(pruned_path))
+        print("Time is after pruning: ", time.clock())
 
         # Convert path to waypoints
         waypoints = [(p[0] - north_offset, p[1] - east_offset, TARGET_ALTITUDE+1) for p in pruned_path]
