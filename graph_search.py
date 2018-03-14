@@ -67,6 +67,7 @@ for e in edges:
 
 path = a_star_graph(G, heuristic, close_start_pt, close_goal_pt)
 
+shortestpath = nx.dijkstra_path(G, close_start_pt, close_goal_pt, 'weight')
 
 plt.plot(start_ne[1], start_ne[0], 'rx')
 plt.plot(goal_ne[1], goal_ne[0], 'rx')
@@ -74,7 +75,15 @@ plt.plot(goal_ne[1], goal_ne[0], 'rx')
 plt.plot(close_start_pt[1], close_start_pt[0], 'yo')
 plt.plot(close_goal_pt[1], close_goal_pt[0], 'yo')
 
+# plot dijkstra path in cyan
+for pt in shortestpath :
+    plt.plot(pt[1], pt[0], 'g^' )
+
 # plot path in yellow
+for p in range(0, len(path[0])-1) :
+    pt = path[0][p].next_node()
+    plt.plot(pt[1], pt[0], 'yo' )
+
 
 plt.xlabel('EAST')
 plt.ylabel('NORTH')
