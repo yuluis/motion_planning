@@ -5,11 +5,11 @@ import pkg_resources
 #pkg_resources.require("networkx==2.0")
 import networkx as nx
 
-from planning_utils import a_star_graph, valid_actions_graph
+from planning_utils import a_star_graph, distance
 import numpy as np
 import matplotlib.pyplot as plt
 from grid import create_grid_and_edges
-import numpy.linalg as LA
+
 
 plt.rcParams['figure.figsize'] = 6,6
 
@@ -42,9 +42,7 @@ print(len(edges))
 plt.imshow(grid, origin='lower', cmap='Greys')
 G = nx.Graph()
 
-def distance(x,y):
-    return LA.norm(np.array(x)-np.array(y))
-    #return np.sqrt((x[0]- y[0])^2 + (x[1] - y[1])^2)
+
 def heuristic(n1, n2):
     # TODO: define a heuristic
     return distance(n1,n2)
@@ -67,6 +65,8 @@ for e in edges:
         close_goal_pt = p1
 
 
+path = a_star_graph(G, heuristic, close_start_pt, close_goal_pt)
+
 
 plt.plot(start_ne[1], start_ne[0], 'rx')
 plt.plot(goal_ne[1], goal_ne[0], 'rx')
@@ -74,10 +74,12 @@ plt.plot(goal_ne[1], goal_ne[0], 'rx')
 plt.plot(close_start_pt[1], close_start_pt[0], 'yo')
 plt.plot(close_goal_pt[1], close_goal_pt[0], 'yo')
 
+# plot path in yellow
+
 plt.xlabel('EAST')
 plt.ylabel('NORTH')
 plt.show()
 
-path = a_star_graph(G, heuristic, close_start_pt, close_goal_pt)
+
 
 print("done")

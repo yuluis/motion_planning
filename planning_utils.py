@@ -2,6 +2,7 @@ from enum import Enum
 from queue import PriorityQueue
 import numpy as np
 from queue import PriorityQueue
+import networkx as nx
 
 def create_grid(data, drone_altitude, safety_distance):
     """
@@ -194,11 +195,43 @@ def prune_path(path):
             i += 1
     return pruned_path
 
+import numpy.linalg as LA
+
+def distance(x,y):
+    return LA.norm(np.array(x)-np.array(y))
+    #return np.sqrt((x[0]- y[0])^2 + (x[1] - y[1])^2)
+
+class Action_graph:
+    """
+    An action is represented by a 3 element tuple.
+
+    The first 2 values is next_node. The third and final value
+    is the cost of performing the action.
+    """
+    action = [0, 0,0]
+
+    def __init__(self, action):
+
+        self.action = action
+
+    def cost(self):
+        return self.action[0]
+
+
+    def next_node(self):
+        return (self.action[1], self.action[2])
 
 def valid_actions_graph(graph, current_node):
     # show what edges of current_node
-    neighbors = list(nx.all_neighbors(G, close_start_pt))
-    return neighbors
+    action_list = []
+    all_neighbors = list(nx.all_neighbors(graph, current_node))
+    for neighbor in all_neighbors:
+        # create list of Action_graphs
+        cost = distance(current_node, neighbor)
+        ag = Action_graph([cost, neighbor[0], neighbor[1]])
+        action_list.append(ag)
+
+    return(action_list)
 
 ###### THIS IS YOUR OLD GRID-BASED A* IMPLEMENTATION #######
 ###### With a few minor modifications it can work with graphs! ####
@@ -208,6 +241,7 @@ def a_star_graph(graph, heuristic, start, goal):
     queue = PriorityQueue()
     queue.put((0, start))
     visited = set(start)
+    action_list2 = []
 
     branch = {}
     found = False
@@ -223,12 +257,11 @@ def a_star_graph(graph, heuristic, start, goal):
             break
 
         else:
-            for action in valid_actions_graph(graph, current_node):
-                # get the tuple representation
-                da = action.delta
-                cost = action.cost
-                next_node = (current_node[0] + da[0], current_node[1] + da[1])
-                new_cost = current_cost + cost + h(next_node, goal)
+            action_list2 = valid_actions_graph(graph, current_node)
+            for action in action_list2:
+                cost = action.cost()
+                next_node = action.next_node()
+                new_cost = current_cost + cost + heuristic(next_node, goal)
 
                 if next_node not in visited:
                     visited.add(next_node)
