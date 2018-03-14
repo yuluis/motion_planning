@@ -3,12 +3,14 @@ import matplotlib.pyplot as plt
 
 def attraction(position, goal, alpha):
     # TODO: implement attraction force
-    alpha * (position - goal)
-    pass
+
+    x = alpha * (position[0] - goal[0])
+    y = alpha * (position[1] - goal[1])
+    return [x,y]
 
 def repulsion(position, obstacle, beta, q_max):
     # TODO: implement replusion force
-    pass
+    return [0,0]
 
 
 def potential_field(grid, goal, alpha, beta, q_max):
