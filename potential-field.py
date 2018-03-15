@@ -8,8 +8,15 @@ def attraction(position, goal, alpha):
     y = alpha * (position[1] - goal[1])
     return [x,y]
 
+def distance (x,y):
+    return np.sqrt((x[0] - y[0])^2 + (x[1]-y[1])^2)
+
 def repulsion(position, obstacle, beta, q_max):
     # TODO: implement replusion force
+    dist = distance (position, obstacle)
+
+    if (dist < q_max):
+        repel = beta * (1/q_max - 1/dist) * 1/ dist^2
     return [0,0]
 
 
