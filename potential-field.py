@@ -1,24 +1,35 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def attraction(position, goal, alpha):
-    # TODO: implement attraction force
-
-    x = alpha * (position[0] - goal[0])
-    y = alpha * (position[1] - goal[1])
-    return [x,y]
 
 def distance (x,y):
     return np.sqrt((x[0] - y[0])^2 + (x[1]-y[1])^2)
 
+def attraction(position, goal, alpha):
+    # TODO: implement attraction force
+    if goal[0] != position[0] :
+        angle = np.arctan((goal[1]-position[1])/(goal[0]-position[0]))
+        x = alpha * distance(position, goal) * np.sin(angle)
+        y = alpha * distance(position, goal) * np.cos(angle)
+        return (x,y)
+    else:
+        return(0,0)
+
+
 def repulsion(position, obstacle, beta, q_max):
     # TODO: implement replusion force
-    dist = distance (position, obstacle)
+    dist = distance(position, obstacle)
+    if goal[0] != obstacle[0] :
+        angle = np.arctan((obstacle[1]-position[1])/(obstacle[0]-position[0]))
+        x = 0
+        y = 0
+        if dist < q_max :
+            x = beta * (1/q_max - 1/dist) * 1/ dist/dist * np.sin(angle)
+            y = beta * (1/q_max - 1/dist) * 1 / dist/dist * np.cos(angle)
 
-    if (dist < q_max):
-        repel = beta * (1/q_max - 1/dist) * 1/ dist^2
-    return [0,0]
-
+        return (x, y)
+    else:
+        return (0,0)
 
 def potential_field(grid, goal, alpha, beta, q_max):
     x = []
@@ -33,17 +44,20 @@ def potential_field(grid, goal, alpha, beta, q_max):
             if grid[i, j] == 0:
 
                 # add attraction force
-                force = attraction([i, j], goal, alpha)
+                forcex, forcey = attraction([i, j], goal, alpha)
 
                 for (oi, oj) in zip(obs_i, obs_j):
                     if np.linalg.norm(np.array([i, j]) - np.array([oi, oj])) < q_max:
                         # add replusion force
-                        force += repulsion([i, j], [oi, oj], beta, q_max)
+                        repulsex,repulsey = repulsion([i, j], [oi, oj], beta, q_max)
+                        forcex = forcex +repulsex
+                        forcey = forcey +repulsey
+
 
                 x.append(i)
                 y.append(j)
-                fx.append(force[0])
-                fy.append(force[1])
+                fx.append(forcex)
+                fy.append(forcey)
 
     return x, y, fx, fy
 
@@ -52,12 +66,12 @@ grid = np.zeros((30, 30))
 grid[10:15,10:15] = 1.0
 grid[17:25,10:17] = 1.0
 
-goal  = [5, 5]
+goal  = [2, 25]
 
 # constants
 alpha = 1.0
 beta = 2.0
-q_max = 10
+q_max = 5.0
 
 x, y, fx, fy = potential_field(grid, goal, alpha, beta, q_max)
 
