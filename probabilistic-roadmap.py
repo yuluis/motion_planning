@@ -21,7 +21,7 @@ polygons = sampler._polygons
 
 # Example: sampling 100 points and removing
 # ones conflicting with obstacles.
-nodes = sampler.sample(200)
+nodes = sampler.sample(100)
 print(len(nodes))
 
 import numpy.linalg as LA
@@ -54,7 +54,7 @@ def create_graph(nodes, k):
 
 import time
 t0 = time.time()
-g = create_graph(nodes, 10)
+g = create_graph(nodes, 20)
 print('graph took {0} seconds to build'.format(time.time()-t0))
 
 print("Number of edges", len(g.edges))
