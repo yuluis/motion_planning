@@ -3,33 +3,37 @@ import matplotlib.pyplot as plt
 
 
 def distance (x,y):
-    return np.sqrt((x[0] - y[0])^2 + (x[1]-y[1])^2)
+    #if (x[0] - y[0]) ==0 or (x[1]-y[1]) ==0 :
+    #    return 0
+    return np.linalg.norm(np.array(x) - np.array(y))
+    #np.sqrt(int((x[0] - y[0])^2 + (x[1]-y[1])^2))
 
 def attraction(position, goal, alpha):
     # TODO: implement attraction force
-    if goal[0] != position[0] :
-        angle = np.arctan((goal[1]-position[1])/(goal[0]-position[0]))
-        x = alpha * distance(position, goal) * np.sin(angle)
-        y = alpha * distance(position, goal) * np.cos(angle)
-        return (x,y)
-    else:
-        return(0,0)
+
+    x = alpha * (goal[0]-position[0])
+    y = alpha * (goal[1]-position[1])
+    return (x,y)
+
 
 
 def repulsion(position, obstacle, beta, q_max):
     # TODO: implement replusion force
     dist = distance(position, obstacle)
-    if goal[0] != obstacle[0] :
-        angle = np.arctan((obstacle[1]-position[1])/(obstacle[0]-position[0]))
-        x = 0
-        y = 0
-        if dist < q_max :
-            x = beta * (1/q_max - 1/dist) * 1/ dist/dist * np.sin(angle)
-            y = beta * (1/q_max - 1/dist) * 1 / dist/dist * np.cos(angle)
+    distx = obstacle[0]-position[0]
+    disty = obstacle[1]-position[1]
 
-        return (x, y)
-    else:
+    x = 0
+    y = 0
+    if distx == 0 or disty == 0:
         return (0,0)
+
+    if dist < q_max :
+        x = beta * (1/q_max - 1/distx) * 1/ distx/distx
+        y = beta * (1/q_max - 1/disty) * 1 / disty/disty
+
+    return (x, y)
+
 
 def potential_field(grid, goal, alpha, beta, q_max):
     x = []
@@ -42,17 +46,16 @@ def potential_field(grid, goal, alpha, beta, q_max):
     for i in range(grid.shape[0]):
         for j in range(grid.shape[1]):
             if grid[i, j] == 0:
-
+                forcex = 0
+                forcey = 0
                 # add attraction force
                 forcex, forcey = attraction([i, j], goal, alpha)
 
                 for (oi, oj) in zip(obs_i, obs_j):
                     if np.linalg.norm(np.array([i, j]) - np.array([oi, oj])) < q_max:
-                        # add replusion force
                         repulsex,repulsey = repulsion([i, j], [oi, oj], beta, q_max)
                         forcex = forcex +repulsex
                         forcey = forcey +repulsey
-
 
                 x.append(i)
                 y.append(j)
@@ -66,11 +69,11 @@ grid = np.zeros((30, 30))
 grid[10:15,10:15] = 1.0
 grid[17:25,10:17] = 1.0
 
-goal  = [2, 25]
+goal  = [15, 18]
 
 # constants
 alpha = 1.0
-beta = 2.0
+beta = 10.0
 q_max = 5.0
 
 x, y, fx, fy = potential_field(grid, goal, alpha, beta, q_max)
