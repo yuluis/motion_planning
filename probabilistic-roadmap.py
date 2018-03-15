@@ -21,7 +21,7 @@ polygons = sampler._polygons
 
 # Example: sampling 100 points and removing
 # ones conflicting with obstacles.
-nodes = sampler.sample(30)
+nodes = sampler.sample(200)
 print(len(nodes))
 
 import numpy.linalg as LA
@@ -62,30 +62,6 @@ print("Number of edges", len(g.edges))
 from grid import create_grid
 
 grid = create_grid(data, sampler._zmax, 1)
-
-fig = plt.figure()
-
-plt.imshow(grid, cmap='Greys', origin='lower')
-
-nmin = np.min(data[:, 0])
-emin = np.min(data[:, 1])
-
-# draw edges
-for (n1, n2) in g.edges:
-    plt.plot([n1[1] - emin, n2[1] - emin], [n1[0] - nmin, n2[0] - nmin], 'black', alpha=0.5)
-
-# draw all nodes
-for n1 in nodes:
-    plt.scatter(n1[1] - emin, n1[0] - nmin, c='blue')
-
-# draw connected nodes
-for n1 in g.nodes:
-    plt.scatter(n1[1] - emin, n1[0] - nmin, c='red')
-
-plt.xlabel('NORTH')
-plt.ylabel('EAST')
-
-plt.show()
 
 def heuristic(n1, n2):
     # TODO: finish
