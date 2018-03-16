@@ -6,10 +6,10 @@ from grid import create_grid
 # Voxel map creation routine
 from voxmap import create_voxmap
 # 2D A* planning routine (can you convert to 3D??)
-from planning import a_star
+from planning3D import a_star
 # Random sampling routine
 from sampling import Sampler
-from planning_utils import a_star, heuristic, prune_path
+from planning_utils import heuristic, prune_path
 
 
 #1. Load the colliders data
@@ -41,8 +41,8 @@ north_offset = int(np.abs(np.min(data[:, 0])))
 east_offset = int(np.abs(np.min(data[:, 1])))
 print("North offset = {0}, east offset = {1}".format(north_offset, east_offset))
 print("Time is: ", time.clock())
-grid_start = (north_offset, east_offset)  # center of map? 305,345
-grid_goal = (461, 510)
+grid_start = (north_offset, east_offset, -5)  # center of map? 305,345
+grid_goal = (461, 510, -5)
 print('Local Start and Goal: ', grid_start, grid_goal)
 path, _ = a_star(grid, heuristic, grid_start, grid_goal)
 print("Time is after astar: ", time.clock())

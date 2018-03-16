@@ -13,7 +13,7 @@ filename = 'colliders.csv'
 data = np.loadtxt(filename, delimiter=',', dtype='Float64', skiprows=3)
 print(data)
 
-voxmap = create_voxmap(data, 10)
+voxmap = create_voxmap(data, 20)
 print(voxmap.shape)
 print("Time is after create_voxmap: ", time.clock())
 
