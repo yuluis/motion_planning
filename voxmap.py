@@ -35,10 +35,10 @@ def create_voxmap(data, voxel_size=5):
         # i.e. grid[0:5, 20:26, 2:7] = True
         north, east, alt, d_north, d_east, d_alt = data[i, :]
         obstacle = [
-            int(north - d_north - north_min_center) // voxel_size,
-            int(north + d_north - north_min_center) // voxel_size,
-            int(east - d_east - east_min_center) // voxel_size,
-            int(east + d_east - east_min_center) // voxel_size,
+            int(north - d_north - north_min) // voxel_size,
+            int(north + d_north - north_min) // voxel_size,
+            int(east - d_east - east_min) // voxel_size,
+            int(east + d_east - east_min) // voxel_size,
         ]
         height = int(alt + d_alt) // voxel_size
         voxmap[obstacle[0]:obstacle[1], obstacle[2]:obstacle[3], 0:height] = True
