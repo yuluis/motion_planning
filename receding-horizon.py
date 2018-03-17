@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import time
 # Grid creation routine
 from grid import create_grid
@@ -35,33 +36,48 @@ print(data)
 
 flight_altitude = 3
 safety_distance = 3
-grid = create_grid(data, flight_altitude, safety_distance)
+myVoxelSize = 5
+voxmap = create_voxmap(data, voxel_size=myVoxelSize )
 
 north_offset = int(np.abs(np.min(data[:, 0])))
 east_offset = int(np.abs(np.min(data[:, 1])))
-print("North offset = {0}, east offset = {1}".format(north_offset, east_offset))
+# maximum altitude
+alt_max = np.ceil(np.amax(data[:, 2] + data[:, 5]))
+
+print("North offset = {0}, east offset = {1}, altitude {2}".format(north_offset, east_offset, alt_max))
 print("Time is: ", time.clock())
-grid_start = (north_offset, east_offset, -5)  # center of map? 305,345
-grid_goal = (461, 510, -5)
-print('Local Start and Goal: ', grid_start, grid_goal)
-path, _ = a_star(grid, heuristic, grid_start, grid_goal)
+vox_start = (north_offset, east_offset, 10)  # center of map? 305,345
+vox_start = list((np.array(vox_start)//myVoxelSize).astype(int))
+vox_goal = (461, 510, 10)
+vox_goal = list((np.array(vox_goal)//myVoxelSize).astype(int))
+
+print('Local Start and Goal: ', vox_start, vox_goal)
+path, _ = a_star(voxmap, heuristic, vox_start, vox_goal)
 print("Time is after astar: ", time.clock())
 pruned_path = prune_path(path)
 print(len(pruned_path))
 print("Time is after pruning: ", time.clock())
 
-fig = plt.figure()
 
-plt.imshow(grid, cmap='Greys', origin='lower')
+
+
+print(voxmap.shape)
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+ax.voxels(voxmap, edgecolor='k')
+ax.set_xlim(voxmap.shape[0], 0)
+ax.set_ylim(0, voxmap.shape[1])
+# add 100 to the height so the buildings aren't so tall
+ax.set_zlim(0, voxmap.shape[2]+70)
 
 for p in pruned_path :
-    plt.plot(p[1], p[0], 'yo')
+    plt.plot(p[1], p[0], P[2], 'yo')
 
-plt.xlabel('NORTH')
-plt.ylabel('EAST')
+
+plt.xlabel('North')
+plt.ylabel('East')
 
 plt.show()
-
 
 
 

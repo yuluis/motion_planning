@@ -12,57 +12,51 @@ class Action(Enum):
     is the cost of performing the action.
     """
 
-    WEST = (0, -1, 1)
-    EAST = (0, 1, 1)
-    NORTH = (-1, 0, 1)
-    SOUTH = (1, 0, 1)
-    NORTH_WEST = (-1, -1, np.sqrt(2))
-    NORTH_EAST = (-1, 1, np.sqrt(2))
-    SOUTH_WEST = (1, -1, np.sqrt(2))
-    SOUTH_EAST = (1, 1, np.sqrt(2))
+    WEST = (0, -1, 0, 1)
+    EAST = (0, 1, 0, 1)
+    NORTH = (1, 0, 0, 1)
+    SOUTH = (-1, 0, 0,  1)
+    UP = (0, 0, 1, 1)
+    DOWN = (0, 0, -1, 1)
 
     @property
     def cost(self):
-        return self.value[2]
+        return self.value[3]
 
     @property
     def delta(self):
-        return (self.value[0], self.value[1])
+        return (self.value[0], self.value[1], self.value[2])
 
 
-def valid_actions(grid, current_node):
+def valid_actions(voxel, current_node):
     """
     Returns a list of valid actions given a grid and current node.
     """
     valid_actions = list(Action)
-    n, m = grid.shape[0] - 1, grid.shape[1] - 1
-    x, y = current_node
+    n, m, p = voxel.shape[0] - 1, voxel.shape[1] - 1, voxel.shape[2] - 1
+    x, y, z = current_node
 
     # check if the node is off the grid or
     # it's an obstacle
 
-    if x - 1 < 0 or grid[x - 1, y] == 1:
+    if x + 1 > n or voxel[x + 1, y, z] == 1:
         valid_actions.remove(Action.NORTH)
-    if x + 1 > n or grid[x + 1, y] == 1:
+    if x - 1 < 0 or voxel[x - 1, y, z] == 1:
         valid_actions.remove(Action.SOUTH)
-    if y - 1 < 0 or grid[x, y - 1] == 1:
+    if y - 1 < 0 or voxel[x, y - 1, z] == 1:
         valid_actions.remove(Action.WEST)
-    if y + 1 > m or grid[x, y + 1] == 1:
+    if y + 1 > m or voxel[x, y + 1, z] == 1:
         valid_actions.remove(Action.EAST)
 
-    if (x - 1 < 0 and y - 1 < 0) or grid[x - 1, y - 1] == 1:
-        valid_actions.remove(Action.NORTH_WEST)
-    if (x - 1 < 0 and y + 1 > m) or grid[x - 1, y + 1] == 1:
-        valid_actions.remove(Action.NORTH_EAST)
-    if (x + 1 > n and y - 1 < 0) or grid[x + 1, y - 1] == 1:
-        valid_actions.remove(Action.SOUTH_WEST)
-    if (x + 1 > n and y + 1 > m) or grid[x + 1, y + 1] == 1:
-        valid_actions.remove(Action.SOUTH_EAST)
+    if (z - 1 < 0  or voxel[x,y,z-1] == 1) :  #NEU framing
+        valid_actions.remove(Action.DOWN)
+    if (z + 1 > p  or voxel[x,y,z+1] == 1) :  #NEU framing
+        valid_actions.remove(Action.UP)
 
     return valid_actions
 
 
-def a_star(grid, heuristic_func, start, goal):
+def a_star(voxel, heuristic_func, start, goal):
     """
     Given a grid and heuristic function returns
     the lowest cost path from start to goal.
@@ -88,8 +82,8 @@ def a_star(grid, heuristic_func, start, goal):
             break
         else:
             # Get the new vertexes connected to the current vertex
-            for a in valid_actions(grid, current_node):
-                next_node = (current_node[0] + a.delta[0], current_node[1] + a.delta[1])
+            for a in valid_actions(voxel, current_node):
+                next_node = (current_node[0] + a.delta[0], current_node[1] + a.delta[1], current_node[2] + a.delta[2])
                 new_cost = current_cost + a.cost + heuristic_func(next_node, goal)
 
                 if next_node not in visited:
