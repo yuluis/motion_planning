@@ -9,10 +9,11 @@ from planning_utils import a_star_graph, distance
 import numpy as np
 import matplotlib.pyplot as plt
 from grid import create_grid_and_edges
-
+import time
 
 plt.rcParams['figure.figsize'] = 6,6
 
+print("start time", time.clock())
 # This is the same obstacle data from the previous lesson.
 filename = 'colliders.csv'
 data = np.loadtxt(filename, delimiter=',', dtype='Float64', skiprows=3)
@@ -64,11 +65,11 @@ for e in edges:
         close_goal_dist = dist_g
         close_goal_pt = p1
 
-
+print("graph digested", time.clock())
 path = a_star_graph(G, heuristic, close_start_pt, close_goal_pt)
-
+print("A* graph found", time.clock())
 shortestpath = nx.dijkstra_path(G, close_start_pt, close_goal_pt, 'weight')
-
+print("dijkstra graph found", time.clock())
 plt.plot(start_ne[1], start_ne[0], 'rx')
 plt.plot(goal_ne[1], goal_ne[0], 'rx')
 
