@@ -123,7 +123,11 @@ myVoxelSize = 1
 voxmap = create_voxmap(data, voxel_size=myVoxelSize )
 center = (355,425,10) #NEU framing, center of voxel, start (305,435,10)
 vox_start = (355,425,10)
-vox_goal = (365,435,10)
+vox_start_offset = (vox_start[0]-center[0], vox_start[1]-center[1], vox_start[2]-center[2])
+vox_goal = (395,465,30)
+vox_goal_offset = (vox_goal[0]-center[0], vox_goal[1]-center[1], vox_goal[2]-center[2])
+
+
 def create_voxsubmap(voxmap, center, voxsubdim) :
     northrange = (0, voxmap.shape[0])
     eastrange = (0, voxmap.shape[1])
@@ -148,14 +152,14 @@ voxsubmap = create_voxsubmap(voxmap, center, voxsubdim)
 print("Time after voxsubmap is: ", time.clock())
 
 
-print('Local Start and Goal: ', vox_start, vox_goal)
-path, _ = a_star(voxsubmap, heuristic, vox_start, vox_goal) # intermediate goal within submap
+print('Local Start and Goal: ', vox_start_offset, vox_goal_offset)
+path, _ = a_star(voxsubmap, heuristic, vox_start_offset, vox_goal_offset) # intermediate goal within submap
 print("Time is after astar: ", time.clock())
 pruned_path = prune_path(path)
 print(len(pruned_path))
 print("Time is after pruning: ", time.clock())
 
-print(voxsubmap.shape)
+print("voxsubmap shape", voxsubmap.shape)
 fig = plt.figure()
 ax = fig.gca(projection='3d')
 ax.voxels(voxsubmap, edgecolor='k')
@@ -165,7 +169,7 @@ ax.set_ylim(0, voxsubmap.shape[1])
 ax.set_zlim(0, voxsubmap.shape[2])
 
 for p in pruned_path :
-    plt.plot(p[1], p[0], P[2], 'yo')
+    ax.scatter(p[1], p[0], p[2], 'yo')
 
 
 plt.xlabel('North')
