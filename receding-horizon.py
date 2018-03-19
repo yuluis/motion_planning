@@ -83,29 +83,29 @@ for e in edges:
         close_goal_dist = dist_g
         close_goal_pt = p1
 
-    print("graph digested", time.clock())
-    path = a_star_graph(G, heuristic, close_start_pt, close_goal_pt)
-    print("A* graph found", time.clock())
+print("graph digested", time.clock())
+path = a_star_graph(G, heuristic, close_start_pt, close_goal_pt)
+print("A* graph found", time.clock())
 #    shortestpath = nx.dijkstra_path(G, close_start_pt, close_goal_pt, 'weight')
 #    print("dijkstra graph found", time.clock())
-    plt.plot(start_ne[1], start_ne[0], 'rx')
-    plt.plot(goal_ne[1], goal_ne[0], 'rx')
+plt.plot(start_ne[1], start_ne[0], 'rx')
+plt.plot(goal_ne[1], goal_ne[0], 'rx')
 
-    plt.plot(close_start_pt[1], close_start_pt[0], 'yo')
-    plt.plot(close_goal_pt[1], close_goal_pt[0], 'yo')
+plt.plot(close_start_pt[1], close_start_pt[0], 'yo')
+plt.plot(close_goal_pt[1], close_goal_pt[0], 'yo')
 
-    # plot dijkstra path in cyan
+# plot dijkstra path in cyan
 #    for pt in shortestpath:
 #        plt.plot(pt[1], pt[0], 'g^')
 
-    # plot path in yellow
-    for p in range(0, len(path[0]) - 1):
-        pt = path[0][p].next_node()
-        plt.plot(pt[1], pt[0], 'yo')
+# plot path in yellow
+for p in range(0, len(path[0]) - 1):
+    pt = path[0][p].next_node()
+    plt.plot(pt[1], pt[0], 'yo')
 
-    plt.xlabel('EAST')
-    plt.ylabel('NORTH')
-    plt.show()
+plt.xlabel('EAST')
+plt.ylabel('NORTH')
+
 
 
 
@@ -122,7 +122,8 @@ myVoxelSize = 1
 
 voxmap = create_voxmap(data, voxel_size=myVoxelSize )
 center = (355,425,10) #NEU framing, center of voxel, start (305,435,10)
-
+vox_start = (355,425,10)
+vox_goal = (365,435,10)
 def create_voxsubmap(voxmap, center, voxsubdim) :
     northrange = (0, voxmap.shape[0])
     eastrange = (0, voxmap.shape[1])
@@ -147,15 +148,12 @@ voxsubmap = create_voxsubmap(voxmap, center, voxsubdim)
 print("Time after voxsubmap is: ", time.clock())
 
 
-#print('Local Start and Goal: ', vox_start, vox_goal)
-#path, _ = a_star(voxsubmap, heuristic, vox_start, vox_goal) # intermediate goal within submap
-#print("Time is after astar: ", time.clock())
-#pruned_path = prune_path(path)
-#print(len(pruned_path))
-#print("Time is after pruning: ", time.clock())
-
-
-
+print('Local Start and Goal: ', vox_start, vox_goal)
+path, _ = a_star(voxsubmap, heuristic, vox_start, vox_goal) # intermediate goal within submap
+print("Time is after astar: ", time.clock())
+pruned_path = prune_path(path)
+print(len(pruned_path))
+print("Time is after pruning: ", time.clock())
 
 print(voxsubmap.shape)
 fig = plt.figure()
@@ -166,8 +164,8 @@ ax.set_ylim(0, voxsubmap.shape[1])
 # add 100 to the height so the buildings aren't so tall
 ax.set_zlim(0, voxsubmap.shape[2])
 
-#for p in pruned_path :
-#    plt.plot(p[1], p[0], P[2], 'yo')
+for p in pruned_path :
+    plt.plot(p[1], p[0], P[2], 'yo')
 
 
 plt.xlabel('North')
