@@ -116,15 +116,13 @@ class MotionPlanning(Drone):
 
     def plan_path(self):
         self.flight_state = States.PLANNING
-        print("Searching for a path ...")
-        print("Time is: ", time.clock())
+        myStartTime = time.clock()
+        print("Searching for a path ...(T0)")
 
         TARGET_ALTITUDE = 5
         SAFETY_DISTANCE = 4
-
         self.target_position[2] = TARGET_ALTITUDE
 
-        # DO: read lat0, lon0 from colliders into floating point values
         file = open("colliders.csv","r")
         file.readline()
         data = file.readline()
@@ -133,15 +131,13 @@ class MotionPlanning(Drone):
         lon0 = float(lon0)
         file.close()
 
-        print("starting latitude, longitude",lat0,lon0)
+        print("starting latitude, longitude",lat0,lon0) #TODO map start and goal onto valid locally defined space
         # DO: set home position to (lat0, lon0, 0)
-
         self.set_home_position(lon0, lat0, 0)  # set the current location to be the home position
         # DO: convert to current local position using global_to_local()
         global_home = [lon0, lat0, 0]
         global_position = [lon0, lat0, 0]
         local_position = global_to_local(global_position, global_home)
-
         print('global home {0}, position {1}, local position {2}'.format(self.global_home, self.global_position,
                                                                          self.local_position))
         # Read in obstacle map
@@ -151,7 +147,7 @@ class MotionPlanning(Drone):
         east_offset = int(np.abs(np.min(data[:, 1])))
 
         print("North offset = {0}, east offset = {1}".format(north_offset, east_offset))
-        print("Time is: ", time.clock())
+        print("Finished reading collider data. Time elapsed: ", time.clock() - myStartTime)
 
         # Define a grid for a particular altitude and safety margin around obstacles
         grid = create_grid(data, TARGET_ALTITUDE, SAFETY_DISTANCE)
