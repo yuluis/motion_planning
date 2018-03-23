@@ -5,7 +5,7 @@ import time
 # Grid creation routine
 from grid import create_grid
 # Voxel map creation routine
-from voxmap import create_voxmap
+from voxmap import create_voxsubmap
 # 2D A* planning routine (can you convert to 3D??)
 from planning3D import a_star
 # Random sampling routine
@@ -34,7 +34,7 @@ from grid import create_grid_and_edges
 plt.rcParams['figure.figsize'] = 6,6
 
 # This is the same obstacle data from the previous lesson.
-filename = 'colliders.csv'
+filename = 'colliders-short.csv'
 data = np.loadtxt(filename, delimiter=',', dtype='Float64', skiprows=3)
 print(data)
 
@@ -105,75 +105,37 @@ for p in range(0, len(path[0]) - 1):
 
 print("path length", len(path[0]))
 
-pruned_path = prune_path(path)
-print("pruned path length", len(pruned_path[0]))
-print("Time is after pruning: ", time.clock())
-
-# plot path in yellow
-for p in range(0, len(pruned_path[0]) - 1):
-    pt = pruned_path[0][p].next_node()
-    plt.plot(pt[1], pt[0], 'bx')
-
-
 plt.xlabel('EAST')
 plt.ylabel('NORTH')
-
-plt.show()
-
-
 
 
 
 #--voxel code below
+# close_start_pt
 
 flight_altitude = 3
 safety_distance = 3
-myVoxelSize = 1
+myVoxelSize = 5
+
+print ("start {1} and next {2}", close_start_pt, close_start_pt)
+# path is the global graph solution that will lead us close to the goal
+
+#   create a voxel map centered on current drone position (path and index)
+#   identify point on graph closest to the goal within the voxel space and A* to that point
+
+curr_position = close_start_pt
+voxsubdim = (20, 20, 10)  # half dimension north, east, up
+myVoxelSize = 5
+while curr_position != close_goal_pt :
+    voxsubmap, next_position = create_voxsubmap(data, G, path, curr_position, voxsubdim)
+#    sub_path, _ = a_star(voxsubmap, heuristic, curr_position, next_position)
+#    pruned_path = prune_path(sub_path)
+#    print(len(pruned_path))
 
 
-
-voxmap = create_voxmap(data, voxel_size=myVoxelSize )
-center = (355,425,10) #NEU framing, center of voxel, start (305,435,10)
-vox_start = (355,425,100)
-vox_start_offset = (vox_start[0]-center[0], vox_start[1]-center[1], vox_start[2]-center[2])
-vox_goal = (395,465,30)
-vox_goal_offset = (vox_goal[0]-center[0], vox_goal[1]-center[1], vox_goal[2]-center[2])
-
-
-def create_voxsubmap(voxmap, center, voxsubdim) :
-    northrange = (0, voxmap.shape[0])
-    eastrange = (0, voxmap.shape[1])
-    altituderange = (0, voxmap.shape[2])
-
-    submap = [0,0,0,0,0,0]
-    submap[0] = max (northrange[0], center[0] - voxsubdim[0])
-    submap[1] = min (northrange[1], center[0] + voxsubdim[0])
-    submap[2] = max (eastrange[0], center[1]- voxsubdim[1])
-    submap[3] = min (eastrange[1], center[1] + voxsubdim[1])
-    submap[4] = max (altituderange[0], center[2]- voxsubdim[2])
-    submap[5] = min (altituderange[1], center[2] + voxsubdim[2])
-
-    voxsubmap = voxmap[submap[0]:submap[1], submap[2]:submap[3],submap[4]:submap[5]]
-
-
-    return voxsubmap
-
-voxsubdim = (20, 20, 10) #half dimension north, east, up
-voxsubmap = create_voxsubmap(voxmap, center, voxsubdim)
-
-print("Time after voxsubmap is: ", time.clock())
-
-
-print('Local Start and Goal: ', vox_start_offset, vox_goal_offset)
-path, _ = a_star(voxsubmap, heuristic, vox_start_offset, vox_goal_offset) # intermediate goal within submap
-print("Time is after astar: ", time.clock())
-pruned_path = prune_path(path)
-print(len(pruned_path))
-print("Time is after pruning: ", time.clock())
-
-print("voxsubmap shape", voxsubmap.shape)
-fig = plt.figure()
-ax = fig.gca(projection='3d')
+print("Final voxmap after reaching goal")
+fig2 = plt.figure()
+ax = fig2.gca(projection='3d')
 ax.voxels(voxsubmap, edgecolor='k')
 ax.set_xlim(voxsubmap.shape[0], 0)
 ax.set_ylim(0, voxsubmap.shape[1])
@@ -182,10 +144,6 @@ ax.set_zlim(0, voxsubmap.shape[2])
 
 for p in pruned_path :
     ax.scatter(p[1], p[0], p[2], 'yo')
-
-
-plt.xlabel('North')
-plt.ylabel('East')
 
 plt.show()
 
