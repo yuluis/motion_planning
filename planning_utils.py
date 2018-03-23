@@ -166,14 +166,14 @@ def heuristic(position, goal_position):
 def point(p):
     return np.array([p[0], p[1], 1.]).reshape(1, -1)
 
-def collinearity_check(p1, p2, p3, epsilon=1e-6):
+def collinearity_check(p1, p2, p3, epsilon=100):
     m = np.concatenate((p1, p2, p3), 0)
     det = np.linalg.det(m)
     return abs(det) < epsilon
 
 
 def prune_path(path):
-    pruned_path = [p for p in path]
+    pruned_path = [p for p in path[0]]
 
     i = 0
     while i < len(pruned_path) - 2:
