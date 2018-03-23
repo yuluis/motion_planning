@@ -1,60 +1,34 @@
-import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-import time
-# Grid creation routine
-from grid import create_grid
-# Voxel map creation routine
-from voxmap import create_voxsubmap
-# 2D A* planning routine (can you convert to 3D??)
-from planning3D import a_star
-# Random sampling routine
-from sampling import Sampler
-from planning_utils import heuristic, prune_path
-
-import pkg_resources
 import networkx as nx
-from planning_utils import a_star_graph, distance
-from grid import create_grid_and_edges
+import numpy as np
+import pkg_resources
+from sampling import Sampler
+import time
 
-
-#1. Load the colliders data
-#Discretize your search space into a grid or graph
-#Define a start and goal location
-#Find a coarse 2D plan from start to goal
-
-#Choose a location along that plan and discretize a local volume around that location (for example,
-# you might try a 40x40 m area that is 10 m high discretized into 1m^3 voxels)
-
-#Define your goal in the local volume to a a node or voxel at the edge of the volume in the direction of the
-# next waypoint in your coarse global plan.
-#Plan a path through your 3D grid or graph to that node or voxel at the edge of the local volume.
-
+from receding_utils import create_grid_and_edges
+#from grid import create_grid
+#from planning3D import a_star
+#from planning_utils import heuristic, prune_path
+#from planning_utils import a_star_graph, distance
+#from voxmap import create_voxsubmap
 
 plt.rcParams['figure.figsize'] = 6,6
 
-# This is the same obstacle data from the previous lesson.
 filename = 'colliders-short.csv'
 data = np.loadtxt(filename, delimiter=',', dtype='Float64', skiprows=3)
-print(data)
 
+
+drone_altitude = 5
+start_ne = (25,  100, drone_altitude) #NEU
+goal_ne = (750, 370, drone_altitude)
+close_start_pt = (0,0, drone_altitude) # near point on graph
+close_goal_pt = (0,0, drone_altitude)
 close_start_dist= 9999
 close_goal_dist = 9999
-start_ne = (25,  100)
-#goal_ne = (750., 370.)
-goal_ne = (750, 370)
-
-close_start_pt = (9999,9999)
-close_goal_pt = (9999,9999)
-
-dist_s = 9999
-dist_g = 9999
-
-# Static drone altitude (metres)
-drone_altitude = 5
 
 # This is now the routine using Voronoi
-grid, edges = create_grid_and_edges(data, drone_altitude)
+grid, edges = create_grid_and_edges(data, drone_altitude) # Voronoi fix altitude
 print(len(edges))
 
 # equivalent to
