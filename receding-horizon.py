@@ -103,10 +103,22 @@ for p in range(0, len(path[0]) - 1):
     pt = path[0][p].next_node()
     plt.plot(pt[1], pt[0], 'yo')
 
+print("path length", len(path[0]))
+
+pruned_path = prune_path(path)
+print("pruned path length", len(pruned_path[0]))
+print("Time is after pruning: ", time.clock())
+
+# plot path in yellow
+for p in range(0, len(pruned_path[0]) - 1):
+    pt = pruned_path[0][p].next_node()
+    plt.plot(pt[1], pt[0], 'bx')
+
+
 plt.xlabel('EAST')
 plt.ylabel('NORTH')
 
-
+plt.show()
 
 
 
@@ -122,7 +134,7 @@ myVoxelSize = 1
 
 voxmap = create_voxmap(data, voxel_size=myVoxelSize )
 center = (355,425,10) #NEU framing, center of voxel, start (305,435,10)
-vox_start = (355,425,10)
+vox_start = (355,425,100)
 vox_start_offset = (vox_start[0]-center[0], vox_start[1]-center[1], vox_start[2]-center[2])
 vox_goal = (395,465,30)
 vox_goal_offset = (vox_goal[0]-center[0], vox_goal[1]-center[1], vox_goal[2]-center[2])
